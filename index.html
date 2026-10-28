@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#244b38"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Mon Troupeau"><link rel="manifest" href="./manifest.json"><link rel="apple-touch-icon" href="./icon-192.png"><title>Mon Troupeau</title>
+<style>
+:root{--green:#244b38;--sage:#dfe9dc;--cream:#f7f6ef;--ink:#1e2a22;--muted:#68756b;--line:#dce3d9;--white:#fff;--orange:#f2dfb9}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:16px system-ui,-apple-system,Segoe UI,sans-serif;padding-bottom:86px}button,input,select,textarea{font:inherit}button{cursor:pointer}.top{background:var(--green);color:white;padding:22px 18px 24px;border-radius:0 0 24px 24px}.top small{opacity:.8}.top h1{margin:5px 0;font-size:26px}.top p{margin:0;color:#dce8dd;font-size:14px}.wrap{max-width:760px;margin:auto}.content{padding:18px;}.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 14px}.sectionhead h2{margin:0;font-size:21px}.btn{border:0;border-radius:13px;padding:11px 14px;font-weight:650;background:var(--green);color:white}.btn.secondary{background:var(--sage);color:var(--green)}.btn.ghost{background:white;color:var(--green);border:1px solid var(--line)}.btn.danger{background:#9d342e}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.stat,.card{background:white;border:1px solid var(--line);border-radius:18px;padding:15px}.stat span{display:block;color:var(--muted);font-size:13px}.stat strong{font-size:28px;display:block;margin-top:5px}.stat em{font-style:normal;font-size:24px}.card{margin-bottom:10px}.animalrow{display:flex;justify-content:space-between;gap:12px;align-items:center}.animalrow h3{margin:0 0 4px;font-size:17px}.muted{color:var(--muted);font-size:13px}.tag{display:inline-block;background:var(--sage);color:var(--green);border-radius:20px;padding:4px 9px;font-size:12px;font-weight:650}.tag.warn{background:var(--orange);color:#67460c}.field{display:block;margin:13px 0}.field span{display:block;font-size:13px;font-weight:650;margin-bottom:6px}.field input,.field select,.field textarea,.search{width:100%;border:1px solid #cbd6ca;background:white;border-radius:12px;padding:12px;color:var(--ink);outline-color:var(--green)}.field textarea{min-height:82px;resize:vertical}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;padding:7px 4px calc(7px + env(safe-area-inset-bottom));z-index:10}.nav button{flex:1;max-width:180px;border:0;background:transparent;color:var(--muted);padding:8px 2px;border-radius:12px;font-size:11px}.nav button b{display:block;font-size:21px;font-weight:500;margin-bottom:2px}.nav button.active{background:var(--sage);color:var(--green);font-weight:700}.hidden{display:none!important}.empty{text-align:center;padding:26px 15px;color:var(--muted)}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.notice{padding:12px 14px;background:#edf3e9;border:1px solid #d5e2d1;border-radius:13px;font-size:13px;line-height:1.45;margin-bottom:14px}.divider{height:1px;background:var(--line);margin:15px 0}.event{border-left:3px solid #86a88a;padding:4px 0 8px 12px;margin:12px 0}.event strong{display:block}.event p{margin:3px 0}.subhead{font-size:15px;margin:18px 0 9px}.smallbtn{padding:8px 10px;font-size:13px}.search{margin-bottom:12px}.footnote{font-size:12px;color:var(--muted);line-height:1.5;margin-top:16px}
+@media(min-width:600px){.content{padding:22px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.top{padding-left:26px}.formgrid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><small>GESTION D'ÉLEVAGE · HORS LIGNE</small><h1>🐄 Mon Troupeau</h1><p>Simple, pratique, vos données restent sur cet appareil.</p></header>
+<main class="content">
+<section id="page-home">
+<div class="sectionhead"><h2>Vue d'ensemble</h2><button class="btn smallbtn" onclick="openAnimalForm()">＋ Animal</button></div>
+<div class="grid">
+<div class="stat"><span>Animaux présents</span><strong id="count-present">0</strong></div>
+<div class="stat"><span>Femelles</span><strong id="count-f">0</strong></div>
+<div class="stat"><span>Mâles</span><strong id="count-m">0</strong></div>
+<div class="stat"><span>Vêlages à venir (30 j)</span><strong id="count-calv">0</strong></div>
+</div>
+<h3 class="subhead">À surveiller</h3><div id="upcoming"></div>
+<h3 class="subhead">Derniers événements</h3><div id="recent"></div>
+</section>
+<section id="page-animals" class="hidden">
+<div class="sectionhead"><h2>Mes animaux</h2><button class="btn smallbtn" onclick="openAnimalForm()">＋ Ajouter</button></div>
+<input id="search" class="search" placeholder="Rechercher une boucle, un nom, une race…" oninput="renderAnimals()">
+<div id="animal-list"></div>
+</section>
+<section id="page-events" class="hidden">
+<div class="sectionhead"><h2>Événements</h2><button class="btn smallbtn" onclick="openEventForm()">＋ Ajouter</button></div>
+<div id="event-list"></div>
+</section>
+<section id="page-settings" class="hidden">
+<div class="sectionhead"><h2>Réglages & sauvegardes</h2></div>
+<div class="notice"><strong>Stockage local :</strong> les données restent dans le navigateur de ce téléphone. Elles ne sont pas envoyées dans le cloud. Exportez régulièrement une sauvegarde et gardez-la ailleurs pour éviter toute perte en cas de panne ou de changement de téléphone.</div>
+<div class="card"><h3 style="margin-top:0">Sauvegarder mes données</h3><p class="muted">Télécharge un fichier JSON contenant les animaux et événements.</p><button class="btn" onclick="exportJSON()">Exporter la sauvegarde</button> <button class="btn secondary" onclick="exportCSV()">Exporter les animaux en CSV</button></div>
+<div class="card"><h3 style="margin-top:0">Restaurer une sauvegarde</h3><p class="muted">Choisis un fichier JSON précédemment exporté. Les données importées remplaceront les données actuelles.</p><label class="btn secondary" style="display:inline-block">Choisir un fichier<input type="file" accept=".json,application/json" onchange="importJSON(event)" hidden></label></div>
+<div class="card"><h3 style="margin-top:0">Données de démonstration</h3><p class="muted">L'application démarre vide. Tu peux ajouter tes propres animaux.</p><button class="btn ghost" onclick="addDemo()">Ajouter 3 animaux fictifs</button></div>
+<div class="card"><h3 style="margin-top:0">Effacer les données</h3><p class="muted">Action définitive. Fais une sauvegarde avant si nécessaire.</p><button class="btn danger" onclick="clearAll()">Tout effacer</button></div>
+<p class="footnote">Cette version est un prototype local de gestion du troupeau. Elle ne remplace pas les déclarations officielles et ne synchronise pas les données avec l'EDE ou la BDNI.</p>
+</section>
+<section id="page-animal-form" class="hidden">
+<div class="sectionhead"><h2 id="animal-form-title">Ajouter un bovin</h2><button class="btn ghost smallbtn" onclick="showPage('animals')">Retour</button></div>
+<form id="animal-form" onsubmit="saveAnimal(event)">
+<input id="animal-id" type="hidden">
+<label class="field"><span>Numéro national / boucle *</span><input id="a-tag" required maxlength="40" placeholder="Ex. FR 1234 5678 9012"></label>
+<div class="formgrid">
+<label class="field"><span>Nom / surnom</span><input id="a-name" placeholder="Ex. Belle"></label>
+<label class="field"><span>Sexe *</span><select id="a-sex" required><option value="Femelle">Femelle</option><option value="Mâle">Mâle</option></select></label>
+<label class="field"><span>Race</span><input id="a-breed" placeholder="Ex. Charolaise"></label>
+<label class="field"><span>Date de naissance</span><input id="a-birth" type="date"></label>
+<label class="field"><span>Date d'entrée</span><input id="a-entry" type="date"></label>
+<label class="field"><span>Mère (n° de boucle)</span><input id="a-dam"></label>
+<label class="field"><span>Père (n° de boucle)</span><input id="a-sire"></label>
+<label class="field"><span>Statut *</span><select id="a-status"><option>Présent</option><option>Vendu</option><option>Mort</option></select></label>
+<label class="field"><span>Date de sortie</span><input id="a-exit" type="date"></label>
+</div>
+<label class="field"><span>Notes</span><textarea id="a-notes" placeholder="Informations utiles…"></textarea></label>
+<div class="actions"><button class="btn" type="submit">Enregistrer l'animal</button><button class="btn ghost" type="button" onclick="showPage('animals')">Annuler</button></div>
+</form></section>
+<section id="page-animal-detail" class="hidden"><div id="animal-detail"></div></section>
+<section id="page-event-form" class="hidden">
+<div class="sectionhead"><h2>Nouvel événement</h2><button class="btn ghost smallbtn" onclick="showPage('events')">Retour</button></div>
+<form onsubmit="saveEvent(event)">
+<label class="field"><span>Animal *</span><select id="e-animal" required></select></label>
+<label class="field"><span>Type d'événement *</span><select id="e-type"><option>Vêlage / naissance</option><option>Saillie</option><option>Insémination artificielle</option><option>Soin / traitement</option><option>Pesée</option><option>Entrée</option><option>Sortie</option><option>Rappel</option><option>Note</option></select></label>
+<div class="formgrid"><label class="field"><span>Date *</span><input id="e-date" type="date" required></label><label class="field"><span>Poids (kg)</span><input id="e-weight" type="number" min="0" step="0.1"></label></div>
+<label class="field"><span>Détail / traitement / rappel</span><textarea id="e-notes" placeholder="Détail de l'événement…"></textarea></label>
+<div class="actions"><button class="btn" type="submit">Enregistrer l'événement</button></div>
+</form></section>
+</main>
+</div>
+<nav class="nav">
+<button class="active" data-page="home" onclick="showPage('home')"><b>⌂</b>Accueil</button>
+<button data-page="animals" onclick="showPage('animals')"><b>🐄</b>Animaux</button>
+<button data-page="events" onclick="showPage('events')"><b>▦</b>Événements</button>
+<button data-page="settings" onclick="showPage('settings')"><b>⚙</b>Réglages</button>
+</nav>
+<script>
+const KEY='monTroupeauDataV1';
+let db={animals:[],events:[]};
+const $=id=>document.getElementById(id);
+function load(){try{const x=localStorage.getItem(KEY);if(x)db=JSON.parse(x)}catch(e){alert("Impossible de lire les données locales de ce navigateur.")}renderAll()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){alert("Le stockage du navigateur semble indisponible. Exporte une sauvegarde et essaie un autre navigateur.")}renderAll()}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function dateNow(){return new Date().toISOString().slice(0,10)}
+function fmt(d){if(!d)return '—';let x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString('fr-FR')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function present(){return db.animals.filter(a=>a.status==='Présent')}
+function animalById(id){return db.animals.find(a=>a.id===id)}
+function showPage(name){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));$('page-'+name).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));if(name==='home')renderHome();if(name==='animals')renderAnimals();if(name==='events')renderEvents()}
+function renderAll(){renderHome();renderAnimals();renderEvents()}
+function renderHome(){
+$('count-present').textContent=present().length;$('count-f').textContent=present().filter(a=>a.sex==='Femelle').length;$('count-m').textContent=present().filter(a=>a.sex==='Mâle').length;
+const today=new Date();today.setHours(0,0,0,0);const future=new Date(today);future.setDate(future.getDate()+30);
+const calv=db.events.filter(e=>e.type==='Rappel'&&e.date&&new Date(e.date+'T00:00:00')>=today&&new Date(e.date+'T00:00:00')<=future);
+$('count-calv').textContent=calv.length;
+const upcoming=db.events.filter(e=>e.date&&new Date(e.date+'T00:00:00')>=today).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4);
+$('upcoming').innerHTML=upcoming.length?upcoming.map(e=>`<div class="card animalrow"><div><strong>${esc(e.type)}</strong><div class="muted">${esc(animalById(e.animalId)?.tag||'Animal archivé')} · ${fmt(e.date)}</div><div class="muted">${esc(e.notes||'')}</div></div><span class="tag warn">${fmt(e.date)}</span></div>`).join(''):'<div class="card empty">Aucun rappel à venir. Ajoute un événement de type « Rappel » pour planifier une échéance.</div>';
+const recent=[...db.events].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,4);
+$('recent').innerHTML=recent.length?recent.map(e=>`<div class="card"><strong>${esc(e.type)}</strong><div class="muted">${esc(animalById(e.animalId)?.tag||'Animal archivé')} · ${fmt(e.date)}</div><div>${esc(e.notes||'')}</div></div>`).join(''):'<div class="card empty">Tes événements apparaîtront ici.</div>';
+}
+function renderAnimals(){
+const q=($('search')?.value||'').toLowerCase().trim();const arr=[...db.animals].filter(a=>[a.tag,a.name,a.breed,a.dam,a.sire].some(x=>(x||'').toLowerCase().includes(q))).sort((a,b)=>a.tag.localeCompare(b.tag));
+$('animal-list').innerHTML=arr.length?arr.map(a=>`<div class="card animalrow"><div style="min-width:0"><h3>${esc(a.name||a.tag)}</h3><div class="muted">${esc(a.tag)} · ${esc(a.sex)} · ${esc(a.breed||'Race non renseignée')}</div><div style="margin-top:7px"><span class="tag ${a.status!=='Présent'?'warn':''}">${esc(a.status)}</span></div></div><button class="btn secondary smallbtn" onclick="detail('${a.id}')">Fiche →</button></div>`).join(''):'<div class="card empty">Aucun bovin pour le moment.<br>Appuie sur « Ajouter » pour créer la première fiche.</div>';
+}
+function openAnimalForm(id){
+$('animal-form').reset();$('animal-id').value='';$('animal-form-title').textContent='Ajouter un bovin';$('a-sex').value='Femelle';$('a-status').value='Présent';
+if(id){const a=animalById(id);if(!a)return;$('animal-form-title').textContent='Modifier la fiche';$('animal-id').value=a.id;$('a-tag').value=a.tag;$('a-name').value=a.name||'';$('a-sex').value=a.sex;$('a-breed').value=a.breed||'';$('a-birth').value=a.birth||'';$('a-entry').value=a.entry||'';$('a-dam').value=a.dam||'';$('a-sire').value=a.sire||'';$('a-status').value=a.status||'Présent';$('a-exit').value=a.exit||'';$('a-notes').value=a.notes||''}
+showPage('animal-form')
+}
+function saveAnimal(ev){ev.preventDefault();const id=$('animal-id').value;const tag=$('a-tag').value.trim();if(db.animals.some(a=>a.tag.toLowerCase()===tag.toLowerCase()&&a.id!==id)){alert('Ce numéro de boucle existe déjà.');return}
+const old=animalById(id);const a={id:id||uid(),tag,name:$('a-name').value.trim(),sex:$('a-sex').value,breed:$('a-breed').value.trim(),birth:$('a-birth').value,entry:$('a-entry').value,dam:$('a-dam').value.trim(),sire:$('a-sire').value.trim(),status:$('a-status').value,exit:$('a-exit').value,notes:$('a-notes').value.trim(),created:old?.created||new Date().toISOString()};
+if(a.birth&&a.entry&&a.birth>a.entry){alert("La date de naissance ne peut pas être après la date d'entrée.");return}
+if(old)db.animals=db.animals.map(x=>x.id===id?a:x);else db.animals.push(a);save();showPage('animals')}
+function detail(id){const a=animalById(id);if(!a)return;const evs=db.events.filter(e=>e.animalId===id).sort((x,y)=>(y.date||'').localeCompare(x.date||''));
+$('animal-detail').innerHTML=`<div class="sectionhead"><h2>Fiche bovin</h2><button class="btn ghost smallbtn" onclick="showPage('animals')">← Liste</button></div><div class="card"><span class="tag ${a.status!=='Présent'?'warn':''}">${esc(a.status)}</span><h2 style="margin:10px 0 3px">${esc(a.name||a.tag)}</h2><div class="muted">${esc(a.tag)}</div><div class="divider"></div><div class="formgrid"><div><div class="muted">Sexe</div><strong>${esc(a.sex)}</strong></div><div><div class="muted">Race</div><strong>${esc(a.breed||'—')}</strong></div><div><div class="muted">Naissance</div><strong>${fmt(a.birth)}</strong></div><div><div class="muted">Entrée</div><strong>${fmt(a.entry)}</strong></div><div><div class="muted">Mère</div><strong>${esc(a.dam||'—')}</strong></div><div><div class="muted">Père</div><strong>${esc(a.sire||'—')}</strong></div><div><div class="muted">Sortie</div><strong>${fmt(a.exit)}</strong></div></div><div class="divider"></div><div>${esc(a.notes||'Aucune note.')}</div><div class="actions"><button class="btn" onclick="openAnimalForm('${a.id}')">Modifier</button><button class="btn secondary" onclick="openEventForm('${a.id}')">＋ Événement</button><button class="btn ghost" onclick="deleteAnimal('${a.id}')">Supprimer</button></div></div><h3 class="subhead">Historique</h3>${evs.length?evs.map(e=>`<div class="card"><strong>${esc(e.type)}</strong><div class="muted">${fmt(e.date)}${e.weight?' · '+esc(e.weight)+' kg':''}</div><div>${esc(e.notes||'')}</div></div>`).join(''):'<div class="card empty">Aucun événement enregistré.</div>'}`;
+showPage('animal-detail')}
+function deleteAnimal(id){if(!confirm('Supprimer cette fiche et ses événements associés ?'))return;db.animals=db.animals.filter(a=>a.id!==id);db.events=db.events.filter(e=>e.animalId!==id);save();showPage('animals')}
+function openEventForm(animalId){if(!db.animals.length){alert("Ajoute d'abord un bovin.");return}$('e-animal').innerHTML=db.animals.map(a=>`<option value="${a.id}">${esc(a.tag)}${a.name?' · '+esc(a.name):''}</option>`).join('');if(animalId)$('e-animal').value=animalId;$('e-date').value=dateNow();$('e-type').value='Soin / traitement';$('e-weight').value='';$('e-notes').value='';showPage('event-form')}
+function saveEvent(ev){ev.preventDefault();db.events.push({id:uid(),animalId:$('e-animal').value,type:$('e-type').value,date:$('e-date').value,weight:$('e-weight').value,notes:$('e-notes').value.trim()});save();showPage('events')}
+function renderEvents(){const arr=[...db.events].sort((a,b)=>(b.date||'').localeCompare(a.date||''));$('event-list').innerHTML=arr.length?arr.map(e=>`<div class="card"><div class="animalrow"><div><strong>${esc(e.type)}</strong><div class="muted">${esc(animalById(e.animalId)?.tag||'Animal supprimé')} · ${fmt(e.date)}</div></div><button class="btn ghost smallbtn" onclick="deleteEvent('${e.id}')">Supprimer</button></div>${e.weight?`<p>Poids : ${esc(e.weight)} kg</p>`:''}<p>${esc(e.notes||'')}</p></div>`).join(''):'<div class="card empty">Aucun événement. Tu peux ajouter un vêlage, un soin, une pesée ou un rappel.</div>'}
+function deleteEvent(id){if(confirm('Supprimer cet événement ?')){db.events=db.events.filter(e=>e.id!==id);save()}}
+function exportJSON(){const blob=new Blob([JSON.stringify({...db,exportedAt:new Date().toISOString(),formatVersion:1},null,2)],{type:'application/json'});download(blob,'mon-troupeau-sauvegarde-'+dateNow()+'.json')}
+function exportCSV(){const cols=['tag','name','sex','breed','birth','entry','dam','sire','status','exit','notes'];const csv=[cols.join(';'),...db.animals.map(a=>cols.map(k=>'"'+String(a[k]??'').replace(/"/g,'""')+'"').join(';'))].join('\r\n');download(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),'mon-troupeau-animaux-'+dateNow()+'.csv')}
+function download(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function importJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.animals)||!Array.isArray(x.events))throw Error();if(!confirm('Remplacer les données actuelles par cette sauvegarde ?'))return;db={animals:x.animals,events:x.events};save();alert('Sauvegarde restaurée.')}catch(e){alert('Fichier invalide ou incompatible. Aucune donnée modifiée.')}ev.target.value=''};r.readAsText(f)}
+function clearAll(){if(confirm('Effacer tous les animaux et événements ?')&&confirm('Dernière confirmation : cette action est définitive.')){db={animals:[],events:[]};save();alert('Données effacées.')}} 
+function addDemo(){if(db.animals.length&&!confirm('Ajouter les exemples aux données existantes ?'))return;const today=dateNow();const samples=[{tag:'DEMO-001',name:'Belle (démo)',sex:'Femelle',breed:'Charolaise',birth:'2022-03-12',entry:today,dam:'',sire:'',status:'Présent',exit:'',notes:'Fiche fictive de démonstration.'},{tag:'DEMO-002',name:'Petit veau (démo)',sex:'Mâle',breed:'Charolaise',birth:'2025-02-03',entry:today,dam:'DEMO-001',sire:'',status:'Présent',exit:'',notes:'Fiche fictive de démonstration.'},{tag:'DEMO-003',name:'Marguerite (démo)',sex:'Femelle',breed:'Limousine',birth:'2021-05-18',entry:today,dam:'',sire:'',status:'Présent',exit:'',notes:'Fiche fictive de démonstration.'}];samples.forEach(s=>{if(!db.animals.some(a=>a.tag===s.tag))db.animals.push({...s,id:uid(),created:new Date().toISOString()})});save();showPage('animals')}
+load();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(err => {
+      console.warn('Mode hors ligne non activé :', err);
+    });
+  });
+}
+</script>
+</body></html>

@@ -1,0 +1,15 @@
+{
+  "name": "Mon Troupeau",
+  "short_name": "Troupeau",
+  "description": "Gestion simple d'un troupeau bovin, avec stockage local.",
+  "lang": "fr-FR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f6ef",
+  "theme_color": "#244b38",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
